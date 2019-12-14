@@ -23,6 +23,8 @@ var (
 	TransactorKey = contextKey{
 		KeyName: "transactor",
 	}
+
+	ErrCreateTransaction = errors.New("creating transaction failed")
 )
 
 func GetExecutor(ctx context.Context, executor BoilExecutor) (context.Context, boil.ContextExecutor) {
