@@ -2,27 +2,16 @@ package layer_test
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
-	_ "github.com/lib/pq"
-
 	"github.com/partyzanex/layer"
-	"github.com/pkg/errors"
+	"github.com/partyzanex/testutils"
 	"github.com/volatiletech/sqlboiler/boil"
-)
-
-const (
-	driverName = "postgres"
-	dsn        = "dbname=lp host=localhost port=5432 user=postgres password=535353 sslmode=disable"
 )
 
 func TestGetExecutor(t *testing.T) {
 	t.Parallel()
-	ex, err := getTestExecutor()
-	if err != nil {
-		t.Fatalf("getting test executor failed: %s", err)
-	}
+	ex := testutils.NewSqlDB(t, "postgres", "PG_TEST")
 
 	ctx, e := layer.GetExecutor(nil, nil)
 	if e != nil {
@@ -42,10 +31,9 @@ func TestGetExecutor(t *testing.T) {
 
 func TestGetTransactor(t *testing.T) {
 	t.Parallel()
-	ex, err := getTestExecutor()
-	if err != nil {
-		t.Fatalf("getting test executor failed: %s", err)
-	}
+	ex := testutils.NewSqlDB(t, "postgres", "PG_TEST")
+
+	var err error
 
 	ctx, tr := layer.GetTransactor(nil)
 	if tr != nil {
@@ -88,10 +76,7 @@ func TestExecuteTransaction(t *testing.T) {
 	t.Parallel()
 	var err error
 
-	ex, err := getTestExecutor()
-	if err != nil {
-		t.Fatalf("getting test executor failed: %s", err)
-	}
+	ex := testutils.NewSqlDB(t, "postgres", "PG_TEST")
 
 	ctx := context.TODO()
 
@@ -118,11 +103,34 @@ func TestExecuteTransaction(t *testing.T) {
 	}
 }
 
-func getTestExecutor() (layer.BoilExecutor, error) {
-	db, err := sql.Open(driverName, dsn)
-	if err != nil {
-		return nil, errors.Wrap(err, "create connection failed")
-	}
+func TestCreateTransaction(t *testing.T) {
+	t.Parallel()
+	var err error
 
-	return db, nil
+	ex := testutils.NewSqlDB(t, "postgres", "PG_TEST")
+
+	ctx := context.Background()
+
+	ctx, tr, err := layer.CreateTransaction(ctx, ex)
+	if err != nil {
+		t.Fatalf("creating transaction failed: %s", err)
+	}
+	defer func() {
+		errTr := layer.ExecuteTransaction(tr, err)
+		if errTr != nil {
+			t.Errorf("executing transaction failed: %s", errTr)
+		}
+	}()
+
+	result, err := tr.Exec("select now() as dt")
+	if err != nil {
+		t.Errorf("executing query failed: %s", err)
+	}
+	n, err := result.RowsAffected()
+	if err != nil {
+		t.Errorf("getting affected rows failed: %s", err)
+	}
+	if n != 1 {
+		t.Errorf("wrong count of affected rows: expected 1, got %d", n)
+	}
 }
