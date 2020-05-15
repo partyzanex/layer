@@ -6,7 +6,7 @@ import (
 
 	"github.com/partyzanex/layer"
 	"github.com/partyzanex/testutils"
-	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func TestGetExecutor(t *testing.T) {

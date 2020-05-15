@@ -3,7 +3,7 @@ package layer
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/volatiletech/sqlboiler/boil"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 type BoilExecutor interface {
