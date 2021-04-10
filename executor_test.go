@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	_ "github.com/lib/pq"
+
 	"github.com/partyzanex/layer"
 	"github.com/partyzanex/testutils"
 	"github.com/volatiletech/sqlboiler/v4/boil"

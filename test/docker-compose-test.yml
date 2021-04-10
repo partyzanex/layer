@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  test-run:
+    build:
+      context: ../
+      dockerfile: test/Dockerfile
+    environment:
+      PG_TEST: "postgresql://test:test@postgres:5432/test?sslmode=disable"
+    networks:
+      - layer-test
+
+networks:
+  layer-test:
+    name: layer_test_net
