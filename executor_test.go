@@ -97,7 +97,7 @@ func TestExecuteTransaction(t *testing.T) {
 		t.Errorf("wrong count of affected rows: expected 1, got %d", n)
 	}
 
-	err = layer.ExecuteTransaction(tr, err)
+	layer.ExecuteTransaction(tr, &err)
 	if err != nil {
 		t.Errorf("executing transaction failed: %s", err)
 	}
@@ -116,9 +116,9 @@ func TestCreateTransaction(t *testing.T) {
 		t.Fatalf("creating transaction failed: %s", err)
 	}
 	defer func() {
-		errTr := layer.ExecuteTransaction(tr, err)
-		if errTr != nil {
-			t.Errorf("executing transaction failed: %s", errTr)
+		layer.ExecuteTransaction(tr, &err)
+		if err != nil {
+			t.Errorf("executing transaction failed: %s", err)
 		}
 	}()
 

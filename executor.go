@@ -79,19 +79,17 @@ func CreateTransaction(ctx context.Context, beginner boil.ContextBeginner) (cont
 	return ctx, tx, nil
 }
 
-func ExecuteTransaction(transactor boil.ContextTransactor, err error) error {
+func ExecuteTransaction(transactor boil.ContextTransactor, err *error) {
 	var errTr error
 
-	if err == nil {
+	if *err == nil {
 		errTr = transactor.Commit()
 	}
 
 	if errTr != nil {
 		errTr = transactor.Rollback()
 		if errTr != nil {
-			errTr = errors.Wrap(errTr, "rollback failed")
+			*err = errors.Wrap(errTr, "rollback failed")
 		}
 	}
-
-	return errTr
 }
